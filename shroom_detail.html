@@ -1,0 +1,173 @@
+{% extends "main_navbar.html" %}
+{% block content %}
+
+    <div class="content-wrapper">
+
+        <!-- Page header -->
+        <div class="page-header page-header-default">
+            <div class="page-header-content">
+                <div class="page-title">
+                    <h4><span class="text-semibold">Fungi</span> -
+                        {{ shroom.name }} | {{ shroom.name_latin }}</h4>
+                    <a class="heading-elements-toggle"><i class="icon-more"></i></a></div>
+            </div>
+
+            <div class="breadcrumb-line"><a class="breadcrumb-elements-toggle"><i class="icon-menu-open"></i></a>
+                <ul class="breadcrumb">
+                    <li><a href="/"><i class="icon-home2 position-left"></i>Главная</a></li>
+                    <li><a href="/shrooms">Список всех грибов</a></li>
+                    <li class="active">{{ shroom.name }}</li>
+                </ul>
+                {% if shroom.on_moderation and user and user.group == 2 %}
+                    <ul class="breadcrumb-elements">
+                        <li>
+                            <a href="#" data-toggle="modal" id="approve_shroom">
+                                <i class=" icon-checkmark3 position-left"></i>
+                                Подтвердить гриб
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" data-toggle="modal" id="decline_shroom">
+                                <i class=" icon-cross2 position-left"></i>
+                                Отколонить гриб
+                            </a>
+                        </li>
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+        <!-- /page header -->
+
+
+        <!-- Content area -->
+        <div class="content">
+
+            <!-- Detached content -->
+
+            {# main img #}
+            <div class="panel">
+                <div class="panel-body">
+                    <div class="content-group-lg">
+
+                        <ul class="list-inline list-inline-separate text-muted content-group">
+                            <li>Добавил <a href="#" class="text-muted">UserName</a></li>
+                            <li>5 апреля 2017</li>
+                            <li><a href="#" class="text-muted"><i
+                                    class="icon-heart6 text-size-base text-pink position-left"></i> 12</a>
+                            </li>
+                        </ul>
+
+                        <div class="content-group text-center">
+                            {% if shroom.photo %}
+                                <img src="{{ shroom.photo.path }}" class="img-circle"
+                                     alt="{{ shroom.photo.name }}" width="200px" height="200px">
+                            {% else %}
+                                <img src="{{ shroom.img or '../static/images/default-placeholder.png' }}"
+                                     class="img-circle"
+                                     width="200px" height="200px"
+                                     alt="">
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="content-group-lg">
+                        <h5 class="text-semibold">Параметры</h5>
+
+                        <ul class="list-inline list-inline-separate mb-10">
+                            {% if shroom.body_form %}
+                                <li class="body_form">Плодовое тело <span
+                                        class="text-muted">{{ shroom.body_form.name }}</span>
+                                </li>
+                            {% endif %}
+                            {% if shroom.geminofor_form %}
+                                <li class="geminofor_form">Гименофор <span
+                                        class="text-muted">{{ shroom.geminofor_form.name }}</span>
+                                </li>
+                            {% endif %}
+                            {% if shroom.texture %}
+                                <li class="texture">Текстура <span
+                                        class="text-muted">{{ shroom.texture.name }}</span></li>
+                            {% endif %}
+                            {% if shroom.consistency %}
+                                <li class="consistency">Консистенция <span
+                                        class="text-muted">{{ shroom.consistency.name }}</span>
+                                </li>
+                            {% endif %}
+                            {% if shroom.edge_form %}
+                                <li class="edge_form">Форма края <span
+                                        class="text-muted">{{ shroom.edge_form.name }}</span>
+                                </li>
+                            {% endif %}
+                            {% if shroom.is_biotroph is not none %}
+                                <li class="is_biotroph"><span
+                                        class="text-muted">{{ 'Биотроф' if shroom.is_biotroph else 'Ксенотроф' }}</span>
+                                </li>
+                            {% endif %}
+                            {% if shroom.color is not none %}
+                                <li class="is_biotroph">Цвет <span class="text-muted">{{ shroom.color }}</span>
+                                </li>
+                            {% endif %}
+                        </ul>
+
+
+                    </div>
+
+                    <div>
+                        <h5 class="text-semibold">Описание</h5>
+
+                        <p>{{ shroom.description | safe }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {# /main img#}
+
+
+    <!-- /detached content -->
+
+
+    <!-- Detached sidebar -->
+
+    <!-- /detached sidebar -->
+
+
+    <!-- Footer -->
+    <div class="footer text-muted">
+        © 2015. <a href="#">Limitless Web App Kit</a> by <a href="http://themeforest.net/user/Kopyov"
+                                                            target="_blank">Eugene Kopyov</a>
+    </div>
+    <!-- /footer -->
+
+    </div>
+    <!-- /content area -->
+
+    </div>
+    <script type="text/javascript">
+        $('#approve_shroom').click(function (e) {
+            e.preventDefault();
+            $.post('/shrooms/approve', {
+                'shroom': {{ shroom.id }},
+                'user': {{ user.id or -1 }}
+            }, function (resp) {
+                if (resp == '200') {
+                    window.location.reload();
+                }
+            })
+
+        })
+        $('#decline_shroom').click(function (e) {
+            e.preventDefault();
+            $.post('/shrooms/decline', {
+                'shroom': {{ shroom.id }},
+                'user': {{ user.id or -1}}
+            }, function (resp) {
+                if (resp == '200') {
+                    window.location.href = '/shrooms';
+                }
+            })
+
+        })
+
+    </script>
+{% endblock %}
